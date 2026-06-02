@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyVault — مخزن الدراسة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg2: #0f1420;
+  --bg3: #141926;
+  --card: #1a2035;
+  --card2: #1f2844;
+  --border: rgba(99,179,237,0.12);
+  --border2: rgba(99,179,237,0.22);
+  --accent: #4f8ef7;
+  --accent2: #7c5ffd;
+  --accent3: #2dd4bf;
+  --text: #e8edf8;
+  --text2: #8b95b0;
+  --text3: #5a6480;
+  --gold: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --purple: #8b5cf6;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+
+.logo span { color: var(--accent); }
+
+.header-actions { display: flex; align-items: center; gap: 10px; margin-right: auto; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn:hover { background: var(--card); color: var(--text); border-color: var(--accent); }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: #3a7de8; color: #fff; }
+.btn-accent2 { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+.btn-accent2:hover { background: #6b4fec; color: #fff; }
+
+/* ── LAYOUT ── */
+.layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 260px;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.sidebar-section { padding: 16px; }
+.sidebar-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text2);
+  transition: all 0.2s;
+  margin-bottom: 3px;
+}
+.nav-item:hover { background: var(--card); color: var(--text); }
+.nav-item.active { background: rgba(79,142,247,0.15); color: var(--accent); }
+.nav-item .icon { font-size: 18px; width: 22px; text-align: center; }
+.nav-item .badge {
+  margin-right: auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+/* ── MAIN ── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── VIEWS ── */
+.view { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+.view.active { display: flex; }
+
+/* ── FILES VIEW ── */
+.files-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.files-title { font-size: 18px; font-weight: 700; }
+.search-box {
+  flex: 1;
+  position: relative;
+  max-width: 360px;
+  margin-right: auto;
+}
+.search-box input {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 16px 9px 40px;
+  color: var(--text);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-box input:focus { border-color: var(--accent); }
+.search-box .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  font-size: 16px;
+}
+
+/* ── SUBJECTS ── */
+.subjects-bar {
+  padding: 12px 24px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  flex-shrink: 0;
+}
+.subject-tab {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  color: var(--text2);
+  background: transparent;
+}
+.subject-tab:hover { border-color: var(--accent); color: var(--accent); }
+.subject-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── FILE GRID ── */
+.files-grid {
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.file-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.file-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle, rgba(79,142,247,0.08) 0%, transparent 70%);
+}
+.file-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(79,142,247,0.15);
+}
+
+.file-icon-wrap {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  margin-bottom: 14px;
+}
+.file-icon-wrap.pdf { background: rgba(239,68,68,0.12); }
+.file-icon-wrap.docx { background: rgba(79,142,247,0.12); }
+.file-icon-wrap.pptx { background: rgba(245,158,11,0.12); }
+.file-icon-wrap.txt { background: rgba(45,212,191,0.12); }
+.file-icon-wrap.default { background: rgba(139,92,246,0.12); }
+
+.file-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
+.file-meta { font-size: 12px; color: var(--text3); margin-bottom: 14px; }
+.file-subject-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(79,142,247,0.12);
+  color: var(--accent);
+}
+.file-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.file-card:hover .file-actions { opacity: 1; }
+.file-action-btn {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text2);
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.file-action-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  border: 2px dashed var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  background: var(--card);
+  grid-column: 1 / -1;
+}
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: var(--accent);
+  background: rgba(79,142,247,0.05);
+}
+.upload-zone .upload-icon { font-size: 40px; margin-bottom: 12px; }
+.upload-zone p { color: var(--text2); font-size: 14px; }
+.upload-zone span { color: var(--accent); font-weight: 600; }
+
+/* ── PANEL (AI features) ── */
+.ai-panel {
+  width: 400px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width 0.3s;
+}
+.ai-panel.collapsed { width: 0; overflow: hidden; }
+
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.panel-title { font-size: 16px; font-weight: 700; flex: 1; }
+.panel-close {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+}
+.panel-close:hover { color: var(--text); background: var(--card); }
+
+.panel-tabs {
+  display: flex;
+  padding: 12px 16px;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.panel-tab {
+  flex: 1;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  font-family: 'Cairo', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.panel-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.panel-body { flex: 1; overflow-y: auto; padding: 16px; }
+
+/* ── CHAT ── */
+.chat-view { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chat-msg {
+  max-width: 85%;
+  padding: 14px 18px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.chat-msg.user {
+  background: var(--accent);
+  color: #fff;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+.chat-msg.ai {
+  background: var(--card2);
+  color: var(--text);
+  align-self: flex-start;
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+.chat-msg.ai .source-tag {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text3);
+}
+.chat-msg.ai .source-tag span {
+  background: rgba(79,142,247,0.1);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-right: 4px;
+  font-size: 11px;
+}
+
+.chat-input-area {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+.chat-input-area textarea {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  min-height: 52px;
+  max-height: 120px;
+  transition: border-color 0.2s;
+}
+.chat-input-area textarea:focus { border-color: var(--accent); }
+.send-btn {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.send-btn:hover { background: #3a7de8; transform: scale(1.05); }
+.send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ── MCQ ── */
+.mcq-container { padding: 20px 24px; overflow-y: auto; flex: 1; }
+.mcq-header { margin-bottom: 20px; }
+.mcq-question {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 14px;
+}
+.q-number {
+  font-size: 12px;
+  color: var(--text3);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.q-text { font-size: 15px; font-weight: 600; margin-bottom: 16px; line-height: 1.6; }
+.q-options { display: flex; flex-direction: column; gap: 8px; }
+.q-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+.q-option:hover { border-color: var(--accent); background: rgba(79,142,247,0.05); }
+.q-option.selected { border-color: var(--accent); background: rgba(79,142,247,0.1); color: var(--accent); }
+.q-option.correct { border-color: var(--green); background: rgba(16,185,129,0.1); color: var(--green); }
+.q-option.wrong { border-color: var(--red); background: rgba(239,68,68,0.1); color: var(--red); }
+.opt-letter {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── MINDMAP ── */
+.mindmap-container { flex: 1; overflow: hidden; position: relative; }
+#mindmap-canvas { width: 100%; height: 100%; }
+
+/* ── TRANSLATE ── */
+.translate-container { padding: 20px 24px; overflow-y: auto; flex: 1; }
+.translate-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.translate-label {
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.translate-text {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-wrap;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* ── LOADING ── */
+.loading-dots { display: flex; gap: 6px; align-items: center; padding: 10px 0; }
+.loading-dots span {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: bounce 1.2s infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  width: 460px;
+  max-width: 90vw;
+  transform: scale(0.95);
+  transition: transform 0.2s;
+}
+.modal-overlay.open .modal { transform: scale(1); }
+.modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.modal p { color: var(--text2); font-size: 14px; margin-bottom: 20px; }
+.modal label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text2); }
+.modal input, .modal select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.modal input:focus, .modal select:focus { border-color: var(--accent); }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ── FILE VIEWER ── */
+.file-viewer-panel {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.file-viewer-panel.open { transform: translateX(0); }
+.viewer-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.viewer-title { font-size: 16px; font-weight: 700; flex: 1; }
+.viewer-actions { display: flex; gap: 8px; }
+.viewer-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; padding: 0; }
+.viewer-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  line-height: 1.8;
+  font-size: 15px;
+  white-space: pre-wrap;
+}
+
+/* ── PDF VIEWER ── */
+.pdf-viewer-wrap {
+  background: #525659;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.pdf-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  background: #3a3d40;
+  border-bottom: 1px solid #222;
+  flex-shrink: 0;
+  color: #e0e0e0;
+  font-size: 13px;
+}
+.pdf-toolbar button {
+  background: #4a4d50;
+  border: none;
+  color: #e0e0e0;
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+.pdf-toolbar button:hover { background: #5a5d60; }
+.pdf-toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+.pdf-toolbar input[type=number] {
+  width: 52px;
+  background: #4a4d50;
+  border: 1px solid #666;
+  border-radius: 6px;
+  color: #e0e0e0;
+  padding: 4px 8px;
+  font-size: 13px;
+  text-align: center;
+}
+.pdf-canvas-wrap {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: #525659;
+}
+.pdf-page-canvas {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  display: block;
+  max-width: 100%;
+}
+.pdf-loading {
+  color: #ccc;
+  font-size: 14px;
+  padding: 60px;
+  text-align: center;
+}
+.pdf-toolbar select {
+  background: #4a4d50;
+  border: 1px solid #666;
+  border-radius: 6px;
+  color: #e0e0e0;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text3);
+  gap: 12px;
+}
+.empty-state .big-icon { font-size: 56px; }
+.empty-state h3 { font-size: 18px; color: var(--text2); }
+.empty-state p { font-size: 14px; text-align: center; max-width: 300px; line-height: 1.7; }
+
+/* ── SCORE CARD ── */
+.score-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.score-big { font-size: 56px; font-weight: 900; color: var(--accent); line-height: 1; }
+.score-label { color: var(--text2); font-size: 14px; margin-top: 6px; }
+
+/* ── MINDMAP NODES ── */
+.mm-node {
+  position: absolute;
+  background: var(--card2);
+  border: 1.5px solid var(--border2);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  max-width: 160px;
+}
+.mm-node:hover { border-color: var(--accent); z-index: 10; }
+.mm-node.root {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  font-size: 15px;
+  padding: 12px 20px;
+  max-width: 200px;
+}
+
+/* ── STATS BAR ── */
+.stats-bar {
+  display: flex;
+  gap: 16px;
+  padding: 12px 24px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+}
+.stat-icon { font-size: 18px; }
+.stat-val { font-weight: 700; color: var(--text); }
+
+/* ── GENERATE CONTROLS ── */
+.generate-controls {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.generate-controls select, .generate-controls input[type=number] {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  color: var(--text);
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px;
+  outline: none;
+  min-width: 140px;
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">📚</div>
+    Study<span>Vault</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn" onclick="openUploadModal()">➕ رفع ملف</button>
+    <button class="btn btn-accent2" onclick="openAskAnywhere()">🔍 بحث في كل الملفات</button>
+    <button class="btn btn-primary" id="apiKeyBtn" onclick="openApiModal()">🔑 إعداد API</button>
+  </div>
+</div>
+
+<!-- Layout -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">القائمة</div>
+      <div class="nav-item active" onclick="showView('files')">
+        <span class="icon">🗂️</span> ملفاتي
+        <span class="badge" id="filesCount">0</span>
+      </div>
+      <div class="nav-item" onclick="showView('chat')">
+        <span class="icon">💬</span> اسأل عن الملفات
+      </div>
+      <div class="nav-item" onclick="showView('mcq')">
+        <span class="icon">✅</span> امتحانات MCQ
+      </div>
+      <div class="nav-item" onclick="showView('mindmap')">
+        <span class="icon">🧠</span> خريطة ذهنية
+      </div>
+      <div class="nav-item" onclick="showView('translate')">
+        <span class="icon">🌐</span> ترجمة الملفات
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">المواد الدراسية</div>
+      <div id="subjectsList"></div>
+    </div>
+    <div class="sidebar-section" style="margin-top:auto; border-top: 1px solid var(--border); padding-top: 16px;">
+      <div style="font-size: 12px; color: var(--text3); text-align: center; line-height: 1.7;">
+        StudyVault v2.0<br>مدعوم بـ Gemini / Groq / Claude
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+
+    <!-- FILES VIEW -->
+    <div class="view active" id="view-files">
+      <div class="files-header">
+        <div class="files-title">📂 ملفاتي الدراسية</div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="بحث في الملفات..." id="searchInput" oninput="filterFiles()">
+        </div>
+        <button class="btn btn-primary" onclick="openUploadModal()">➕ رفع ملف</button>
+      </div>
+      <div class="subjects-bar" id="subjectsBar">
+        <div class="subject-tab active" onclick="filterBySubject(null, this)">الكل</div>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-item"><span class="stat-icon">📄</span><span class="stat-val" id="totalFiles">0</span> ملف</div>
+        <div class="stat-item"><span class="stat-icon">📚</span><span class="stat-val" id="totalSubjects">0</span> مادة</div>
+        <div class="stat-item"><span class="stat-icon">💾</span><span class="stat-val" id="totalSize">0 KB</span></div>
+      </div>
+      <div class="files-grid" id="filesGrid">
+        <div class="upload-zone" id="dropZone" onclick="openUploadModal()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+          <div class="upload-icon">☁️</div>
+          <p>اسحب ملفاتك هنا أو <span>اضغط للرفع</span></p>
+          <p style="font-size:12px; margin-top:6px; color: var(--text3)">يدعم: PDF, DOCX, TXT, PPTX</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT VIEW -->
+    <div class="view" id="view-chat">
+      <div class="files-header">
+        <div class="files-title">💬 اسأل عن محتوى ملفاتك</div>
+      </div>
+      <div class="chat-view">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg ai">
+            مرحباً! 👋 أنا مساعدك الدراسي. يمكنك سؤالي عن أي معلومة موجودة في ملفاتك المرفوعة وسأبحث عنها لك. <br><br>
+            مثال: "ما هو تعريف الخلية؟" أو "شرح قانون نيوتن الثالث"
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <textarea id="chatInput" placeholder="اكتب سؤالك هنا..." onkeydown="handleChatKey(event)" rows="1"></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendChat()">↑</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MCQ VIEW -->
+    <div class="view" id="view-mcq">
+      <div class="files-header">
+        <div class="files-title">✅ توليد امتحانات MCQ</div>
+      </div>
+      <div class="generate-controls">
+        <select id="mcqFile">
+          <option value="">اختر ملف لتوليد الأسئلة منه</option>
+        </select>
+        <select id="mcqSubject">
+          <option value="">أو اختر مادة كاملة</option>
+        </select>
+        <input type="number" id="mcqCount" value="5" min="3" max="20" style="width:100px">
+        <label style="font-size:13px; color: var(--text2)">عدد الأسئلة</label>
+        <button class="btn btn-primary" onclick="generateMCQ()">⚡ توليد الامتحان</button>
+      </div>
+      <div id="mcqContent" style="flex:1; overflow-y:auto;">
+        <div class="empty-state">
+          <div class="big-icon">✏️</div>
+          <h3>لا يوجد امتحان حالياً</h3>
+          <p>اختر ملفاً أو مادة دراسية ثم اضغط "توليد الامتحان"</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINDMAP VIEW -->
+    <div class="view" id="view-mindmap">
+      <div class="files-header">
+        <div class="files-title">🧠 الخريطة الذهنية</div>
+      </div>
+      <div class="generate-controls">
+        <select id="mmFile">
+          <option value="">اختر ملف للخريطة الذهنية</option>
+        </select>
+        <button class="btn btn-primary" onclick="generateMindMap()">🧠 توليد الخريطة</button>
+      </div>
+      <div id="mindmapContent" style="flex:1; overflow:hidden; position:relative;">
+        <div class="empty-state">
+          <div class="big-icon">🧠</div>
+          <h3>لا توجد خريطة ذهنية</h3>
+          <p>اختر ملفاً من الأعلى لتوليد خريطة ذهنية تفاعلية</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSLATE VIEW -->
+    <div class="view" id="view-translate">
+      <div class="files-header">
+        <div class="files-title">🌐 ترجمة الملفات</div>
+      </div>
+      <div class="generate-controls">
+        <select id="translateFile">
+          <option value="">اختر ملف للترجمة</option>
+        </select>
+        <select id="translateLang">
+          <option value="ar">إلى العربية</option>
+          <option value="en">إلى الإنجليزية</option>
+          <option value="fr">إلى الفرنسية</option>
+          <option value="de">إلى الألمانية</option>
+          <option value="tr">إلى التركية</option>
+        </select>
+        <button class="btn btn-primary" onclick="translateFile()">🌐 ترجمة</button>
+      </div>
+      <div id="translateContent" style="flex:1; overflow-y:auto; padding: 20px 24px;">
+        <div class="empty-state">
+          <div class="big-icon">🌐</div>
+          <h3>اختر ملفاً للترجمة</h3>
+          <p>اختر الملف ولغة الترجمة ثم اضغط ترجمة</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- File Viewer Panel -->
+<div class="file-viewer-panel" id="fileViewer">
+  <div class="viewer-header">
+    <button class="panel-close" onclick="closeViewer()">✕</button>
+    <div class="viewer-title" id="viewerTitle"></div>
+    <div class="viewer-actions">
+      <button class="btn" id="viewerTranslateBtn">🌐 ترجمة</button>
+      <button class="btn" id="viewerMindMapBtn">🧠 خريطة ذهنية</button>
+      <button class="btn btn-primary" id="viewerMCQBtn">✅ توليد امتحان</button>
+    </div>
+  </div>
+  <!-- PDF toolbar (shown only for PDFs) -->
+  <div class="pdf-toolbar" id="pdfToolbar" style="display:none;">
+    <button onclick="pdfPrevPage()" id="pdfPrevBtn" disabled>◀ السابقة</button>
+    <span id="pdfPageInfo" style="color:#ccc; font-size:13px; min-width:90px; text-align:center;">صفحة - / -</span>
+    <button onclick="pdfNextPage()" id="pdfNextBtn" disabled>التالية ▶</button>
+    <div style="width:1px; height:20px; background:#555; margin:0 4px;"></div>
+    <button onclick="pdfZoom(-0.2)">🔍−</button>
+    <span id="pdfZoomLabel" style="color:#ccc; font-size:12px; min-width:40px; text-align:center;">120%</span>
+    <button onclick="pdfZoom(0.2)">🔍+</button>
+    <button onclick="pdfFitWidth()">↔ ملاءمة</button>
+    <div style="width:1px; height:20px; background:#555; margin:0 4px;"></div>
+    <select id="pdfRenderMode" onchange="switchPdfRenderMode(this.value)" style="background:#4a4d50; border:1px solid #666; border-radius:6px; color:#e0e0e0; padding:4px 8px; font-size:12px;">
+      <option value="canvas">🖼️ عرض صفحة واحدة</option>
+      <option value="all">📄 كل الصفحات</option>
+    </select>
+    <button onclick="downloadCurrentPdf()" style="margin-right:auto;">⬇️ تحميل</button>
+  </div>
+  <div class="viewer-body" id="viewerBody">
+    <!-- PDF canvas render here -->
+    <div class="pdf-viewer-wrap" id="pdfViewerWrap" style="display:none;">
+      <div class="pdf-canvas-wrap" id="pdfCanvasWrap">
+        <div class="pdf-loading" id="pdfLoadingMsg">جاري تحميل الملف...</div>
+      </div>
+    </div>
+    <!-- Text content for non-PDF -->
+    <div style="padding:24px; flex:1; overflow-y:auto;" id="textViewerWrap">
+      <div class="viewer-content" id="viewerContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal">
+    <h3>📁 رفع ملف دراسي</h3>
+    <p>اختر الملف وحدد المادة الدراسية</p>
+    <label>اسم المادة الدراسية</label>
+    <input type="text" id="subjectInput" placeholder="مثال: الفيزياء، الكيمياء، البرمجة..." list="subjectSuggestions">
+    <datalist id="subjectSuggestions"></datalist>
+    <label>اختر الملف</label>
+    <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.pptx" multiple style="background:var(--bg); padding:10px; margin-bottom:16px;">
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('uploadModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="uploadFiles()">📤 رفع</button>
+    </div>
+  </div>
+</div>
+
+<!-- API Key Modal -->
+<div class="modal-overlay" id="apiModal">
+  <div class="modal" style="width:520px; max-width:95vw;">
+    <h3>🔑 ربط الذكاء الاصطناعي</h3>
+    <p>المفتاح يُحفظ في متصفحك فقط ولا يُرسل لأي خادم آخر.</p>
+    <label>اختر مزود الذكاء الاصطناعي</label>
+    <select id="aiProviderSelect" onchange="updateApiPlaceholder()">
+      <option value="gemini">🟦 Google Gemini — مجاني ومُوصى به</option>
+      <option value="groq">⚡ Groq — سريع جداً ومجاني</option>
+      <option value="claude">🟠 Anthropic Claude</option>
+    </select>
+    <div id="stepGuide" style="background:var(--bg3); border-radius:10px; padding:14px; margin-bottom:14px; font-size:13px; line-height:2; border:1px solid var(--border);">
+      <div style="font-weight:700; margin-bottom:4px; color:var(--text);">📋 خطوات الحصول على المفتاح المجاني:</div>
+      <div id="guideSteps"></div>
+    </div>
+    <label>مفتاح API</label>
+    <input type="password" id="apiKeyInput" placeholder="AIza...">
+    <div id="apiHelpText" style="font-size:12px; color:var(--accent); margin-top:-10px; margin-bottom:14px;"></div>
+    <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:12px; color:var(--green);">
+      🔒 المفتاح محفوظ محلياً في متصفحك فقط — لا أحد يراه غيرك
+    </div>
+    <div id="testResult" style="display:none; padding:10px 14px; border-radius:8px; font-size:13px; margin-bottom:12px;"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('apiModal')">لاحقاً</button>
+      <button class="btn" onclick="testApiKey()" id="testBtn">🔬 اختبار المفتاح</button>
+      <button class="btn btn-primary" onclick="saveApiKey()">✅ حفظ والبدء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Welcome Modal (first visit) -->
+<div class="modal-overlay" id="welcomeModal">
+  <div class="modal" style="width:540px; max-width:95vw; text-align:center;">
+    <div style="font-size:52px; margin-bottom:12px;">📚</div>
+    <h3 style="font-size:22px; margin-bottom:8px;">مرحباً في StudyVault</h3>
+    <p style="margin-bottom:20px; font-size:15px;">منصتك الدراسية الذكية — ارفع محاضراتك وتفاعل معها بالذكاء الاصطناعي</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; text-align:right;">
+      <div style="background:var(--bg3); border-radius:10px; padding:12px; border:1px solid var(--border);">
+        <div style="font-size:20px; margin-bottom:4px;">💬</div>
+        <div style="font-size:13px; font-weight:600;">بحث ذكي</div>
+        <div style="font-size:12px; color:var(--text3);">اسأل عن أي معلومة في ملفاتك</div>
+      </div>
+      <div style="background:var(--bg3); border-radius:10px; padding:12px; border:1px solid var(--border);">
+        <div style="font-size:20px; margin-bottom:4px;">✅</div>
+        <div style="font-size:13px; font-weight:600;">امتحانات MCQ</div>
+        <div style="font-size:12px; color:var(--text3);">توليد أسئلة تلقائية من ملفاتك</div>
+      </div>
+      <div style="background:var(--bg3); border-radius:10px; padding:12px; border:1px solid var(--border);">
+        <div style="font-size:20px; margin-bottom:4px;">🧠</div>
+        <div style="font-size:13px; font-weight:600;">خريطة ذهنية</div>
+        <div style="font-size:12px; color:var(--text3);">تلخيص مرئي للمحتوى</div>
+      </div>
+      <div style="background:var(--bg3); border-radius:10px; padding:12px; border:1px solid var(--border);">
+        <div style="font-size:20px; margin-bottom:4px;">🌐</div>
+        <div style="font-size:13px; font-weight:600;">ترجمة فورية</div>
+        <div style="font-size:12px; color:var(--text3);">ترجمة ملفاتك لأي لغة</div>
+      </div>
+    </div>
+    <div style="background:rgba(79,142,247,0.08); border:1px solid rgba(79,142,247,0.2); border-radius:10px; padding:12px; margin-bottom:20px; font-size:13px; color:var(--text2);">
+      ⚡ يحتاج مفتاح <strong style="color:var(--accent);">Groq (مجاني وسريع)</strong> أو Google Gemini أو Claude للميزات الذكية
+    </div>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button class="btn" onclick="closeModal('welcomeModal')">تصفح أولاً</button>
+      <button class="btn btn-primary" onclick="closeModal('welcomeModal'); openApiModal()">🔑 ربط الذكاء الاصطناعي</button>
+    </div>
+  </div>
+</div>
+
+<!-- Global loading overlay -->
+<div id="globalLoader" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:2000; display:none; align-items:center; justify-content:center; flex-direction:column; gap:16px;">
+  <div class="loading-dots"><span></span><span></span><span></span></div>
+  <div style="color:var(--text2); font-size:14px;" id="loaderText">جاري المعالجة...</div>
+</div>
+
+<script>
+// ══ STATE ══
+let files = JSON.parse(localStorage.getItem('studyvault_files') || '[]');
+let apiKey = localStorage.getItem('studyvault_apikey') || '';
+let aiProvider = localStorage.getItem('studyvault_provider') || 'gemini';
+let currentSubjectFilter = null;
+let mcqAnswers = {};
+let mcqCorrect = {};
+let viewerFileId = null;
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ══ INIT ══
+function init() {
+  renderFiles();
+  renderSidebar();
+  updateSelectOptions();
+  const sel = document.getElementById('aiProviderSelect');
+  if (sel && aiProvider) sel.value = aiProvider;
+  updateApiPlaceholder();
+  const isFirstVisit = !localStorage.getItem('studyvault_visited');
+  if (isFirstVisit) {
+    localStorage.setItem('studyvault_visited', '1');
+    setTimeout(() => document.getElementById('welcomeModal').classList.add('open'), 600);
+  } else if (!apiKey) {
+    setTimeout(() => openApiModal(), 600);
+  } else {
+    const label = aiProvider === 'gemini' ? '🟦 Gemini ✓' : aiProvider === 'groq' ? '⚡ Groq ✓' : '🟠 Claude ✓';
+    document.getElementById('apiKeyBtn').textContent = label;
+    document.getElementById('apiKeyBtn').style.background = 'var(--green)';
+  }
+}
+
+// ══ NAVIGATION ══
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.includes(getNavText(name))) n.classList.add('active');
+  });
+}
+
+function getNavText(name) {
+  const map = { files: 'ملفاتي', chat: 'اسأل', mcq: 'امتحانات', mindmap: 'ذهنية', translate: 'ترجمة' };
+  return map[name] || '';
+}
+
+// ══ FILE UPLOAD ══
+function openUploadModal() {
+  document.getElementById('uploadModal').classList.add('open');
+  updateSubjectSuggestions();
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function updateSubjectSuggestions() {
+  const subjects = [...new Set(files.map(f => f.subject))];
+  const dl = document.getElementById('subjectSuggestions');
+  dl.innerHTML = subjects.map(s => `<option value="${s}">`).join('');
+}
+
+async function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result); // data:...;base64,...
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadFiles() {
+  const fileInput = document.getElementById('fileInput');
+  const subject = document.getElementById('subjectInput').value.trim() || 'عام';
+  if (!fileInput.files.length) { alert('اختر ملفاً واحداً على الأقل'); return; }
+
+  showLoader('جاري قراءة الملفات...');
+  for (const file of fileInput.files) {
+    const text = await extractText(file);
+    const isPDF = file.name.toLowerCase().endsWith('.pdf');
+    let rawData = null;
+    if (isPDF) {
+      try { rawData = await fileToBase64(file); } catch(e) {}
+    }
+    const fileObj = {
+      id: Date.now() + Math.random(),
+      name: file.name,
+      subject,
+      type: getFileType(file.name),
+      size: file.size,
+      date: new Date().toLocaleDateString('ar'),
+      content: text.substring(0, 50000),
+      previewContent: text.substring(0, 200),
+      rawData: rawData
+    };
+    files.push(fileObj);
+  }
+  saveFiles();
+  closeModal('uploadModal');
+  hideLoader();
+  document.getElementById('fileInput').value = '';
+  document.getElementById('subjectInput').value = '';
+  renderFiles();
+  renderSidebar();
+  updateSelectOptions();
+}
+
+async function extractText(file) {
+  const name = file.name.toLowerCase();
+  try {
+    if (name.endsWith('.txt')) {
+      return await file.text();
+    } else if (name.endsWith('.pdf')) {
+      return await extractPDF(file);
+    } else if (name.endsWith('.docx')) {
+      return await extractDOCX(file);
+    } else {
+      return `[ملف: ${file.name}] لا يمكن استخراج النص من هذا النوع بشكل تلقائي.`;
+    }
+  } catch(e) {
+    return `[تعذّر قراءة ${file.name}]`;
+  }
+}
+
+async function extractPDF(file) {
+  const ab = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+  let text = '';
+  for (let i = 1; i <= Math.min(pdf.numPages, 30); i++) {
+    const page = await pdf.getPage(i);
+    const tc = await page.getTextContent();
+    text += tc.items.map(item => item.str).join(' ') + '\n';
+  }
+  return text;
+}
+
+async function extractDOCX(file) {
+  const ab = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer: ab });
+  return result.value;
+}
+
+function getFileType(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  return ['pdf', 'docx', 'pptx', 'txt'].includes(ext) ? ext : 'default';
+}
+
+function getFileIcon(type) {
+  const icons = { pdf: '📄', docx: '📝', pptx: '📊', txt: '📃', default: '📁' };
+  return icons[type] || '📁';
+}
+
+// ══ RENDER FILES ══
+function renderFiles(subset) {
+  const grid = document.getElementById('filesGrid');
+  const toShow = subset || getFilteredFiles();
+
+  const cards = toShow.map(f => `
+    <div class="file-card" onclick="openViewer(${f.id})">
+      <div class="file-icon-wrap ${f.type}">${getFileIcon(f.type)}</div>
+      <div class="file-name">${f.name}</div>
+      <div class="file-meta">${f.date} · ${formatSize(f.size)}</div>
+      <div class="file-subject-badge">${f.subject}</div>
+      <div class="file-actions">
+        <div class="file-action-btn" onclick="event.stopPropagation(); quickAction('translate', ${f.id})">🌐 ترجمة</div>
+        <div class="file-action-btn" onclick="event.stopPropagation(); quickAction('mindmap', ${f.id})">🧠 خريطة</div>
+        <div class="file-action-btn" onclick="event.stopPropagation(); quickAction('mcq', ${f.id})">✅ MCQ</div>
+        <div class="file-action-btn" onclick="event.stopPropagation(); deleteFile(${f.id})">🗑️</div>
+      </div>
+    </div>
+  `).join('');
+
+  grid.innerHTML = `
+    <div class="upload-zone" id="dropZone" onclick="openUploadModal()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+      <div class="upload-icon">☁️</div>
+      <p>اسحب ملفاتك هنا أو <span>اضغط للرفع</span></p>
+      <p style="font-size:12px; margin-top:6px; color: var(--text3)">يدعم: PDF, DOCX, TXT</p>
+    </div>
+    ${cards}
+  `;
+
+  document.getElementById('filesCount').textContent = files.length;
+  document.getElementById('totalFiles').textContent = files.length;
+  const subjects = [...new Set(files.map(f => f.subject))];
+  document.getElementById('totalSubjects').textContent = subjects.length;
+  document.getElementById('totalSize').textContent = formatSize(files.reduce((a, f) => a + (f.size || 0), 0));
+}
+
+function getFilteredFiles() {
+  let f = [...files];
+  if (currentSubjectFilter) f = f.filter(x => x.subject === currentSubjectFilter);
+  const q = document.getElementById('searchInput')?.value.toLowerCase() || '';
+  if (q) f = f.filter(x => x.name.toLowerCase().includes(q) || x.subject.toLowerCase().includes(q));
+  return f;
+}
+
+function filterFiles() { renderFiles(); }
+
+function filterBySubject(subject, el) {
+  currentSubjectFilter = subject;
+  document.querySelectorAll('.subject-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderFiles();
+}
+
+function renderSidebar() {
+  const subjects = [...new Set(files.map(f => f.subject))];
+  const list = document.getElementById('subjectsList');
+  list.innerHTML = subjects.map(s => `
+    <div class="nav-item" onclick="filterBySubject('${s}', this); showView('files')">
+      <span class="icon">📚</span> ${s}
+      <span class="badge">${files.filter(f => f.subject === s).length}</span>
+    </div>
+  `).join('');
+
+  const bar = document.getElementById('subjectsBar');
+  bar.innerHTML = `<div class="subject-tab ${!currentSubjectFilter ? 'active' : ''}" onclick="filterBySubject(null, this)">الكل</div>` +
+    subjects.map(s => `<div class="subject-tab ${currentSubjectFilter === s ? 'active' : ''}" onclick="filterBySubject('${s}', this)">${s}</div>`).join('');
+}
+
+function updateSelectOptions() {
+  const fileOpts = files.map(f => `<option value="${f.id}">${f.name} (${f.subject})</option>`).join('');
+  const subjectOpts = [...new Set(files.map(f => f.subject))].map(s => `<option value="${s}">${s}</option>`).join('');
+
+  ['mcqFile', 'mmFile', 'translateFile'].forEach(id => {
+    const el = document.getElementById(id);
+    const def = el.options[0].text;
+    el.innerHTML = `<option value="">${def}</option>` + fileOpts;
+  });
+  document.getElementById('mcqSubject').innerHTML = `<option value="">أو اختر مادة كاملة</option>` + subjectOpts;
+}
+
+function deleteFile(id) {
+  if (!confirm('حذف هذا الملف؟')) return;
+  files = files.filter(f => f.id != id);
+  saveFiles();
+  renderFiles();
+  renderSidebar();
+  updateSelectOptions();
+}
+
+function saveFiles() {
+  localStorage.setItem('studyvault_files', JSON.stringify(files));
+}
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+// ══ DRAG & DROP ══
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.add('dragover');
+}
+function handleDragLeave() { document.getElementById('dropZone').classList.remove('dragover'); }
+async function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('dragover');
+  document.getElementById('fileInput').files = e.dataTransfer.files;
+  const subject = prompt('اسم المادة الدراسية:') || 'عام';
+  document.getElementById('subjectInput').value = subject;
+  await uploadFiles();
+}
+
+// ══ FILE VIEWER ══
+let _pdfDoc = null;
+let _pdfPage = 1;
+let _pdfScale = 1.5;
+let _pdfTotalPages = 0;
+let _currentPdfDataUrl = null;
+let _pdfRenderMode = 'canvas'; // 'canvas' | 'all'
+let _pdfRendering = false;
+
+async function openViewer(id) {
+  const file = files.find(f => f.id == id);
+  if (!file) return;
+  viewerFileId = id;
+  document.getElementById('viewerTitle').textContent = `${getFileIcon(file.type)} ${file.name}`;
+  document.getElementById('fileViewer').classList.add('open');
+
+  document.getElementById('viewerTranslateBtn').onclick = () => { closeViewer(); quickAction('translate', id); };
+  document.getElementById('viewerMindMapBtn').onclick = () => { closeViewer(); quickAction('mindmap', id); };
+  document.getElementById('viewerMCQBtn').onclick = () => { closeViewer(); quickAction('mcq', id); };
+
+  const isPDF = file.type === 'pdf';
+  document.getElementById('pdfToolbar').style.display = isPDF ? 'flex' : 'none';
+  document.getElementById('pdfViewerWrap').style.display = isPDF ? 'flex' : 'none';
+  document.getElementById('textViewerWrap').style.display = isPDF ? 'none' : 'block';
+
+  if (isPDF && file.rawData) {
+    await renderPDFViewer(file.rawData);
+  } else if (isPDF) {
+    document.getElementById('pdfViewerWrap').style.display = 'none';
+    document.getElementById('textViewerWrap').style.display = 'block';
+    document.getElementById('viewerContent').textContent = file.content || 'لا يوجد محتوى نصي.';
+    document.getElementById('pdfToolbar').style.display = 'none';
+  } else {
+    document.getElementById('viewerContent').textContent = file.content || 'لا يوجد محتوى نصي.';
+  }
+}
+
+async function renderPDFViewer(dataUrl) {
+  _currentPdfDataUrl = dataUrl;
+  _pdfPage = 1;
+  _pdfDoc = null;
+  _pdfRenderMode = document.getElementById('pdfRenderMode')?.value || 'canvas';
+
+  const wrap = document.getElementById('pdfCanvasWrap');
+  wrap.innerHTML = '<div class="pdf-loading">⏳ جاري تحميل PDF...</div>';
+
+  try {
+    // Convert data URL to ArrayBuffer
+    const base64 = dataUrl.split(',')[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+    const loadingTask = pdfjsLib.getDocument({ data: bytes.buffer });
+    _pdfDoc = await loadingTask.promise;
+    _pdfTotalPages = _pdfDoc.numPages;
+
+    updatePdfControls();
+
+    if (_pdfRenderMode === 'all') {
+      await renderAllPages();
+    } else {
+      await renderPage(_pdfPage);
+    }
+  } catch(e) {
+    wrap.innerHTML = `<div class="pdf-loading">❌ تعذّر تحميل PDF: ${e.message}</div>`;
+  }
+}
+
+async function renderPage(pageNum) {
+  if (!_pdfDoc || _pdfRendering) return;
+  _pdfRendering = true;
+
+  const wrap = document.getElementById('pdfCanvasWrap');
+  wrap.innerHTML = '<div class="pdf-loading">⏳ جاري عرض الصفحة...</div>';
+
+  try {
+    const page = await _pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale: _pdfScale });
+
+    const canvas = document.createElement('canvas');
+    canvas.className = 'pdf-page-canvas';
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    wrap.innerHTML = '';
+    wrap.appendChild(canvas);
+    _pdfPage = pageNum;
+    updatePdfControls();
+  } catch(e) {
+    wrap.innerHTML = `<div class="pdf-loading">❌ خطأ في العرض: ${e.message}</div>`;
+  }
+  _pdfRendering = false;
+}
+
+async function renderAllPages() {
+  if (!_pdfDoc) return;
+  const wrap = document.getElementById('pdfCanvasWrap');
+  wrap.innerHTML = '<div class="pdf-loading">⏳ جاري تحميل كل الصفحات...</div>';
+
+  const canvases = [];
+  for (let i = 1; i <= _pdfTotalPages; i++) {
+    try {
+      const page = await _pdfDoc.getPage(i);
+      const viewport = page.getViewport({ scale: _pdfScale });
+      const canvas = document.createElement('canvas');
+      canvas.className = 'pdf-page-canvas';
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.title = `صفحة ${i}`;
+      const ctx = canvas.getContext('2d');
+      await page.render({ canvasContext: ctx, viewport }).promise;
+
+      const label = document.createElement('div');
+      label.style.cssText = 'color:#aaa; font-size:12px; text-align:center; padding:4px 0;';
+      label.textContent = `— صفحة ${i} من ${_pdfTotalPages} —`;
+
+      canvases.push(label, canvas);
+    } catch(e) {}
+  }
+  wrap.innerHTML = '';
+  canvases.forEach(el => wrap.appendChild(el));
+}
+
+function updatePdfControls() {
+  document.getElementById('pdfPageInfo').textContent = `صفحة ${_pdfPage} / ${_pdfTotalPages}`;
+  document.getElementById('pdfPrevBtn').disabled = _pdfPage <= 1;
+  document.getElementById('pdfNextBtn').disabled = _pdfPage >= _pdfTotalPages;
+  document.getElementById('pdfZoomLabel').textContent = Math.round(_pdfScale * 100) + '%';
+}
+
+function pdfPrevPage() {
+  if (_pdfPage > 1) renderPage(_pdfPage - 1);
+}
+function pdfNextPage() {
+  if (_pdfPage < _pdfTotalPages) renderPage(_pdfPage + 1);
+}
+function pdfGoToPage(n) {
+  const p = parseInt(n);
+  if (p >= 1 && p <= _pdfTotalPages) renderPage(p);
+}
+function pdfZoom(delta) {
+  _pdfScale = Math.max(0.5, Math.min(3.0, _pdfScale + delta));
+  if (_pdfRenderMode === 'all') renderAllPages();
+  else renderPage(_pdfPage);
+}
+function pdfFitWidth() {
+  const wrap = document.getElementById('pdfCanvasWrap');
+  // Estimate fit scale based on container width
+  _pdfScale = Math.max(0.8, (wrap.clientWidth - 40) / 794);
+  if (_pdfRenderMode === 'all') renderAllPages();
+  else renderPage(_pdfPage);
+}
+async function switchPdfRenderMode(mode) {
+  _pdfRenderMode = mode;
+  const prevBtn = document.getElementById('pdfPrevBtn');
+  const nextBtn = document.getElementById('pdfNextBtn');
+  if (mode === 'all') {
+    prevBtn.disabled = true; nextBtn.disabled = true;
+    await renderAllPages();
+  } else {
+    await renderPage(_pdfPage);
+  }
+}
+
+function downloadCurrentPdf() {
+  if (!_currentPdfDataUrl) return;
+  const file = files.find(f => f.id == viewerFileId);
+  const a = document.createElement('a');
+  a.href = _currentPdfDataUrl;
+  a.download = file ? file.name : 'document.pdf';
+  a.click();
+}
+
+function closeViewer() {
+  document.getElementById('fileViewer').classList.remove('open');
+  _pdfDoc = null;
+  _currentPdfDataUrl = null;
+  // clear iframe to free memory
+  const wrap = document.getElementById('pdfViewerWrap');
+  if (wrap) wrap.innerHTML = '';
+}
+
+function quickAction(action, fileId) {
+  const file = files.find(f => f.id == fileId);
+  if (!file) return;
+  if (action === 'translate') {
+    showView('translate');
+    document.getElementById('translateFile').value = fileId;
+    translateFile();
+  } else if (action === 'mindmap') {
+    showView('mindmap');
+    document.getElementById('mmFile').value = fileId;
+    generateMindMap();
+  } else if (action === 'mcq') {
+    showView('mcq');
+    document.getElementById('mcqFile').value = fileId;
+    generateMCQ();
+  }
+}
+
+// ══ API ══
+function openApiModal() {
+  document.getElementById('apiModal').classList.add('open');
+  const sel = document.getElementById('aiProviderSelect');
+  if (sel) sel.value = aiProvider;
+  updateApiPlaceholder();
+}
+
+function updateApiPlaceholder() {
+  const sel = document.getElementById('aiProviderSelect');
+  if (!sel) return;
+  const provider = sel.value;
+  const input = document.getElementById('apiKeyInput');
+  const help = document.getElementById('apiHelpText');
+  const steps = document.getElementById('guideSteps');
+  if (provider === 'gemini') {
+    input.placeholder = 'AIzaSy...';
+    help.innerHTML = '🔗 <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent);">اضغط هنا لفتح Google AI Studio مباشرة</a>';
+    if (steps) steps.innerHTML = `
+      <div>1️⃣ اذهب إلى <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent);">aistudio.google.com</a></div>
+      <div>2️⃣ سجّل دخول بحسابك في Google</div>
+      <div>3️⃣ اضغط <strong style="color:var(--text)">"Create API Key"</strong></div>
+      <div>4️⃣ انسخ المفتاح والصقه أدناه</div>
+      <div style="color:var(--green); font-size:12px;">✅ مجاني تماماً — لا يحتاج بطاقة ائتمان</div>`;
+  } else if (provider === 'groq') {
+    input.placeholder = 'gsk_...';
+    help.innerHTML = '🔗 <a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent);">اضغط هنا لفتح Groq Console مباشرة</a>';
+    if (steps) steps.innerHTML = `
+      <div>1️⃣ اذهب إلى <a href="https://console.groq.com" target="_blank" style="color:var(--accent);">console.groq.com</a></div>
+      <div>2️⃣ سجّل دخول أو أنشئ حساباً مجانياً</div>
+      <div>3️⃣ اذهب إلى <strong style="color:var(--text)">API Keys</strong> واضغط <strong style="color:var(--text)">Create API Key</strong></div>
+      <div>4️⃣ انسخ المفتاح والصقه أدناه</div>
+      <div style="color:var(--green); font-size:12px;">⚡ مجاني وسريع جداً — يعمل بنماذج Llama و Mixtral</div>`;
+  } else {
+    input.placeholder = 'sk-ant-api03-...';
+    help.innerHTML = '🔗 <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent);">اضغط هنا لفتح Anthropic Console</a>';
+    if (steps) steps.innerHTML = `
+      <div>1️⃣ اذهب إلى <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent);">console.anthropic.com</a></div>
+      <div>2️⃣ أنشئ حساباً أو سجّل دخول</div>
+      <div>3️⃣ اذهب إلى <strong style="color:var(--text)">API Keys</strong> واضغط <strong style="color:var(--text)">Create Key</strong></div>
+      <div>4️⃣ انسخ المفتاح والصقه أدناه</div>
+      <div style="color:var(--gold); font-size:12px;">💳 يحتاج رصيد مدفوع — Gemini أسهل للمبتدئين</div>`;
+  }
+}
+
+async function testApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  const provider = document.getElementById('aiProviderSelect').value;
+  const resultEl = document.getElementById('testResult');
+  const testBtn = document.getElementById('testBtn');
+  if (!key) { 
+    resultEl.style.display = 'block';
+    resultEl.style.background = 'rgba(239,68,68,0.1)';
+    resultEl.style.color = '#ef4444';
+    resultEl.textContent = '⚠️ أدخل المفتاح أولاً';
+    return; 
+  }
+  testBtn.textContent = '⏳ جاري الاختبار...';
+  testBtn.disabled = true;
+  resultEl.style.display = 'none';
+  try {
+    let testResult = '';
+    if (provider === 'gemini') {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: 'قل: مرحبا' }] }], generationConfig: { maxOutputTokens: 20 } })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        const msg = err.error?.message || '';
+        if (res.status === 400 || res.status === 401) throw new Error('المفتاح غير صحيح');
+        if (res.status === 403) throw new Error('المفتاح غير مفعّل أو منتهي الصلاحية');
+        if (res.status === 429) throw new Error('تجاوزت الحد — انتظر قليلاً');
+        throw new Error(msg || `خطأ ${res.status}`);
+      }
+      testResult = 'Gemini';
+    } else if (provider === 'groq') {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', max_tokens: 20, messages: [{ role: 'user', content: 'قل: مرحبا' }] })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        if (res.status === 401) throw new Error('المفتاح غير صحيح');
+        if (res.status === 429) throw new Error('تجاوزت الحد — انتظر قليلاً');
+        throw new Error(err.error?.message || `خطأ ${res.status}`);
+      }
+      testResult = 'Groq ⚡';
+    } else {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 20, messages: [{ role: 'user', content: 'قل: مرحبا' }] })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || `خطأ ${res.status}`);
+      }
+      testResult = 'Claude';
+    }
+    resultEl.style.display = 'block';
+    resultEl.style.background = 'rgba(16,185,129,0.1)';
+    resultEl.style.border = '1px solid rgba(16,185,129,0.3)';
+    resultEl.style.color = '#10b981';
+    resultEl.textContent = `✅ المفتاح يعمل بشكل صحيح مع ${testResult}!`;
+  } catch(e) {
+    resultEl.style.display = 'block';
+    resultEl.style.background = 'rgba(239,68,68,0.1)';
+    resultEl.style.border = '1px solid rgba(239,68,68,0.3)';
+    resultEl.style.color = '#ef4444';
+    if (e.message.includes('fetch') || e.name === 'TypeError') {
+      resultEl.textContent = '❌ تعذّر الاتصال — تحقق من اتصالك بالإنترنت';
+    } else {
+      resultEl.textContent = '❌ ' + e.message;
+    }
+  }
+  testBtn.textContent = '🔬 اختبار المفتاح';
+  testBtn.disabled = false;
+}
+
+function toggleKeyVisibility() {
+  const input = document.getElementById('apiKeyInput');
+  const btn = document.getElementById('keyToggle');
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+  else { input.type = 'password'; btn.textContent = '👁️'; }
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  const provider = document.getElementById('aiProviderSelect').value;
+  if (!key) { alert('أدخل مفتاح API'); return; }
+  apiKey = key;
+  aiProvider = provider;
+  localStorage.setItem('studyvault_apikey', key);
+  localStorage.setItem('studyvault_provider', provider);
+  closeModal('apiModal');
+  const label = provider === 'gemini' ? '🟦 Gemini ✓' : provider === 'groq' ? '⚡ Groq ✓' : '🟠 Claude ✓';
+  document.getElementById('apiKeyBtn').textContent = label;
+  document.getElementById('apiKeyBtn').style.background = 'var(--green)';
+}
+
+async function callAI(prompt, systemPrompt) {
+  if (!apiKey) { openApiModal(); throw new Error('مفتاح API مطلوب'); }
+  if (aiProvider === 'gemini') {
+    return await callGemini(prompt, systemPrompt);
+  } else if (aiProvider === 'groq') {
+    return await callGroq(prompt, systemPrompt);
+  } else {
+    return await callClaude(prompt, systemPrompt);
+  }
+}
+
+async function callGemini(prompt, systemPrompt) {
+  const fullPrompt = systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt;
+  const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+  let lastError = null;
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: fullPrompt }] }],
+          generationConfig: { maxOutputTokens: 4096, temperature: 0.7 }
+        })
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        const msg = err.error?.message || '';
+        if (msg.includes('not found') || msg.includes('404') || response.status === 404) {
+          lastError = new Error(msg);
+          continue;
+        }
+        if (response.status === 400) throw new Error('مفتاح API غير صحيح — تأكد من نسخه كاملاً');
+        if (response.status === 403) throw new Error('المفتاح غير مفعّل أو انتهت صلاحيته — أنشئ مفتاحاً جديداً من aistudio.google.com');
+        if (response.status === 429) throw new Error('تجاوزت الحد المجاني — انتظر دقيقة وحاول مجدداً');
+        throw new Error(msg || `خطأ ${response.status}`);
+      }
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error('لم يرد الذكاء الاصطناعي بأي نص');
+      return text;
+    } catch(e) {
+      if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError') || e.name === 'TypeError') {
+        throw new Error('تعذّر الاتصال بـ Gemini API — تأكد من اتصالك بالإنترنت، أو قد يكون المفتاح محظوراً في منطقتك');
+      }
+      if (!e.message.includes('not found')) throw e;
+      lastError = e;
+    }
+  }
+  throw lastError || new Error('جميع نماذج Gemini غير متاحة حالياً');
+}
+
+async function callGroq(prompt, systemPrompt) {
+  const messages = [];
+  if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+  messages.push({ role: 'user', content: prompt });
+
+  const models = ['llama-3.3-70b-versatile', 'llama3-70b-8192', 'mixtral-8x7b-32768'];
+  let lastError = null;
+  for (const model of models) {
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({ model, max_tokens: 4096, temperature: 0.7, messages })
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        const msg = err.error?.message || '';
+        if (response.status === 401) throw new Error('مفتاح Groq غير صحيح — تأكد من نسخه كاملاً');
+        if (response.status === 429) throw new Error('تجاوزت الحد المجاني — انتظر دقيقة وحاول مجدداً');
+        if (msg.includes('model') || response.status === 404) { lastError = new Error(msg); continue; }
+        throw new Error(msg || `خطأ ${response.status}`);
+      }
+      const data = await response.json();
+      const text = data.choices?.[0]?.message?.content;
+      if (!text) throw new Error('لم يرد Groq بأي نص');
+      return text;
+    } catch(e) {
+      if (e.message.includes('Failed to fetch') || e.name === 'TypeError') {
+        throw new Error('تعذّر الاتصال بـ Groq API — تأكد من اتصالك بالإنترنت');
+      }
+      if (!e.message.includes('model') && !e.message.includes('404')) throw e;
+      lastError = e;
+    }
+  }
+  throw lastError || new Error('جميع نماذج Groq غير متاحة حالياً');
+}
+
+async function callClaude(prompt, systemPrompt) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      system: systemPrompt || 'أنت مساعد تعليمي متخصص. أجب بالعربية دائماً إلا إذا طُلب غير ذلك.',
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error?.message || 'خطأ في Claude API');
+  }
+  const data = await response.json();
+  return data.content[0].text;
+}
+
+// ══ CHAT ══
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const question = input.value.trim();
+  if (!question) return;
+
+  input.value = '';
+  addChatMsg(question, 'user');
+  document.getElementById('sendBtn').disabled = true;
+
+  const loadingId = addChatMsg('<div class="loading-dots"><span></span><span></span><span></span></div>', 'ai', true);
+
+  try {
+    const context = files.map(f => `[ملف: ${f.name} | مادة: ${f.subject}]\n${f.content}`).join('\n\n---\n\n');
+    const prompt = `لديك المحتوى التالي من ملفات دراسية:\n\n${context.substring(0, 30000)}\n\nالسؤال: ${question}\n\nأجب بشكل واضح ومفصل، واذكر من أي ملف أو مادة أخذت المعلومة.`;
+
+    const answer = await callAI(prompt);
+    removeMsg(loadingId);
+    addChatMsgWithSource(answer, getRelevantFiles(question));
+  } catch (e) {
+    removeMsg(loadingId);
+    addChatMsg('❌ حدث خطأ: ' + e.message, 'ai');
+  }
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function getRelevantFiles(q) {
+  const qLower = q.toLowerCase();
+  return files.filter(f => f.content?.toLowerCase().includes(qLower.slice(0, 10))).map(f => f.name);
+}
+
+let msgId = 0;
+function addChatMsg(text, role, raw = false) {
+  const id = 'msg-' + (++msgId);
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  div.id = id;
+  if (raw) div.innerHTML = text; else div.textContent = text;
+  document.getElementById('chatMessages').appendChild(div);
+  document.getElementById('chatMessages').scrollTop = 999999;
+  return id;
+}
+
+function addChatMsgWithSource(text, sources) {
+  const id = 'msg-' + (++msgId);
+  const div = document.createElement('div');
+  div.className = 'chat-msg ai';
+  div.id = id;
+  div.innerHTML = `<div>${text.replace(/\n/g, '<br>')}</div>` +
+    (sources.length ? `<div class="source-tag">المصادر: ${sources.map(s => `<span>${s}</span>`).join('')}</div>` : '');
+  document.getElementById('chatMessages').appendChild(div);
+  document.getElementById('chatMessages').scrollTop = 999999;
+}
+
+function removeMsg(id) { document.getElementById(id)?.remove(); }
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+
+function openAskAnywhere() { showView('chat'); document.getElementById('chatInput').focus(); }
+
+// ══ MCQ ══
+async function generateMCQ() {
+  if (!files.length) { alert('لا توجد ملفات مرفوعة'); return; }
+
+  const fileId = document.getElementById('mcqFile').value;
+  const subject = document.getElementById('mcqSubject').value;
+  const count = parseInt(document.getElementById('mcqCount').value) || 5;
+
+  let content = '';
+  let sourceName = '';
+  if (fileId) {
+    const f = files.find(x => x.id == fileId);
+    content = f.content;
+    sourceName = f.name;
+  } else if (subject) {
+    const sFiles = files.filter(f => f.subject === subject);
+    content = sFiles.map(f => f.content).join('\n\n');
+    sourceName = subject;
+  } else {
+    alert('اختر ملفاً أو مادة');
+    return;
+  }
+
+  showLoader('جاري توليد الامتحان...');
+  try {
+    const prompt = `بناءً على النص التالي، أنشئ ${count} أسئلة اختيار من متعدد (MCQ) باللغة العربية.
+
+النص:
+${content.substring(0, 15000)}
+
+أجب بصيغة JSON فقط بدون أي نص إضافي:
+{
+  "questions": [
+    {
+      "question": "نص السؤال",
+      "options": ["أ) خيار1", "ب) خيار2", "ج) خيار3", "د) خيار4"],
+      "correct": 0,
+      "explanation": "شرح الإجابة الصحيحة"
+    }
+  ]
+}`;
+
+    const raw = await callAI(prompt, 'أنت مساعد تعليمي. أجب بـ JSON فقط بدون markdown أو backticks.');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const data = JSON.parse(clean);
+
+    hideLoader();
+    renderMCQ(data.questions, sourceName);
+    mcqAnswers = {};
+    mcqCorrect = {};
+  } catch (e) {
+    hideLoader();
+    alert('خطأ في التوليد: ' + e.message);
+  }
+}
+
+function renderMCQ(questions, source) {
+  const container = document.getElementById('mcqContent');
+  const optLetters = ['أ', 'ب', 'ج', 'د'];
+  container.innerHTML = `
+    <div class="mcq-container">
+      <div class="mcq-header">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+          <div style="font-size:18px; font-weight:700;">${source}</div>
+          <div style="background:rgba(79,142,247,0.1); color:var(--accent); padding:4px 12px; border-radius:20px; font-size:13px;">${questions.length} سؤال</div>
+        </div>
+        <button class="btn btn-primary" onclick="submitMCQ()" style="margin-left:auto;">✅ تصحيح الامتحان</button>
+      </div>
+      ${questions.map((q, qi) => `
+        <div class="mcq-question" id="q-${qi}">
+          <div class="q-number">السؤال ${qi + 1}</div>
+          <div class="q-text">${q.question}</div>
+          <div class="q-options">
+            ${q.options.map((opt, oi) => `
+              <div class="q-option" id="opt-${qi}-${oi}" onclick="selectOption(${qi}, ${oi}, ${q.correct})">
+                <div class="opt-letter">${optLetters[oi]}</div>
+                ${opt}
+              </div>
+            `).join('')}
+          </div>
+          <div id="exp-${qi}" style="display:none; margin-top:12px; padding:12px; background:rgba(16,185,129,0.08); border-radius:8px; font-size:13px; color:var(--green);">
+            💡 ${q.explanation}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  window._mcqQuestions = questions;
+}
+
+function selectOption(qi, oi, correct) {
+  document.querySelectorAll(`[id^="opt-${qi}-"]`).forEach(el => el.classList.remove('selected'));
+  document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
+  mcqAnswers[qi] = oi;
+  mcqCorrect[qi] = correct;
+}
+
+function submitMCQ() {
+  const qs = window._mcqQuestions || [];
+  let score = 0;
+  qs.forEach((q, qi) => {
+    const selected = mcqAnswers[qi];
+    document.querySelectorAll(`[id^="opt-${qi}-"]`).forEach((el, oi) => {
+      el.classList.remove('selected', 'correct', 'wrong');
+      if (oi === q.correct) el.classList.add('correct');
+      else if (oi === selected && selected !== q.correct) el.classList.add('wrong');
+    });
+    document.getElementById(`exp-${qi}`).style.display = 'block';
+    if (selected === q.correct) score++;
+  });
+
+  const pct = Math.round((score / qs.length) * 100);
+  const scoreEl = document.createElement('div');
+  scoreEl.className = 'score-card';
+  scoreEl.style.margin = '0 24px 0';
+  scoreEl.innerHTML = `<div class="score-big">${pct}%</div><div class="score-label">${score} من ${qs.length} إجابة صحيحة</div>`;
+  document.querySelector('.mcq-container')?.prepend(scoreEl);
+  document.getElementById('mcqContent').scrollTop = 0;
+}
+
+// ══ MIND MAP ══
+async function generateMindMap() {
+  const fileId = document.getElementById('mmFile').value;
+  if (!fileId) { alert('اختر ملفاً'); return; }
+  const file = files.find(f => f.id == fileId);
+
+  showLoader('جاري تحليل الملف وبناء الخريطة...');
+  try {
+    const prompt = `حلل النص التالي واستخرج أهم المفاهيم والنقاط الرئيسية لعمل خريطة ذهنية.
+
+النص:
+${file.content.substring(0, 10000)}
+
+أجب بـ JSON فقط:
+{
+  "root": "الموضوع الرئيسي",
+  "branches": [
+    {
+      "name": "الفرع الرئيسي 1",
+      "children": ["نقطة فرعية 1", "نقطة فرعية 2", "نقطة فرعية 3"]
+    }
+  ]
+}
+
+مهم: لا تضع أكثر من 5 أفرع رئيسية وأكثر من 4 نقاط فرعية لكل فرع.`;
+
+    const raw = await callAI(prompt, 'أنت مساعد تعليمي. أجب بـ JSON فقط.');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const data = JSON.parse(clean);
+    hideLoader();
+    renderMindMap(data, file.name);
+  } catch (e) {
+    hideLoader();
+    alert('خطأ: ' + e.message);
+  }
+}
+
+function renderMindMap(data, title) {
+  const container = document.getElementById('mindmapContent');
+  const branchColors = ['#4f8ef7', '#7c5ffd', '#2dd4bf', '#f59e0b', '#ef4444', '#10b981'];
+
+  let html = `<div style="position:relative; width:100%; height:100%; overflow:auto; padding:40px;">
+    <svg style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;" id="mmSvg"></svg>
+    <div style="position:relative; min-height:500px;">`;
+
+  const branches = data.branches || [];
+  const centerX = 50;
+  const startY = 50 / (branches.length + 1) * 100;
+
+  html += `<div class="mm-node root" style="left:${centerX - 12}%; top:48%; transform:translateY(-50%);" id="mm-root">${data.root}</div>`;
+
+  branches.forEach((branch, bi) => {
+    const yPos = (bi + 1) * (100 / (branches.length + 1));
+    const color = branchColors[bi % branchColors.length];
+    html += `<div class="mm-node" style="left:30%; top:${yPos}%; transform:translateY(-50%); border-color:${color}; color:${color};" id="mm-b${bi}">${branch.name}</div>`;
+    const children = branch.children || [];
+    children.forEach((child, ci) => {
+      const childY = yPos - ((children.length - 1) / 2 * 10) + ci * 10;
+      html += `<div class="mm-node" style="left:58%; top:${childY}%; transform:translateY(-50%); border-color:${color}40; font-size:12px; padding:6px 12px;" id="mm-b${bi}-c${ci}">${child}</div>`;
+    });
+  });
+
+  html += `</div></div>`;
+  container.innerHTML = html;
+}
+
+// ══ TRANSLATE ══
+async function translateFile() {
+  const fileId = document.getElementById('translateFile').value;
+  const lang = document.getElementById('translateLang').value;
+  if (!fileId) { alert('اختر ملفاً'); return; }
+  const file = files.find(f => f.id == fileId);
+  const langNames = { ar: 'العربية', en: 'الإنجليزية', fr: 'الفرنسية', de: 'الألمانية', tr: 'التركية' };
+
+  showLoader('جاري الترجمة...');
+  try {
+    const prompt = `ترجم النص التالي إلى اللغة ${langNames[lang]}. حافظ على بنية النص وترقيمه. أعد النص المترجم فقط دون أي مقدمة أو تعليق.
+
+النص:
+${file.content.substring(0, 12000)}`;
+
+    const translated = await callAI(prompt, `أنت مترجم محترف. ترجم النص إلى ${langNames[lang]} بدقة عالية.`);
+    hideLoader();
+
+    document.getElementById('translateContent').innerHTML = `
+      <div class="translate-container">
+        <div class="translate-box">
+          <div class="translate-label">النص الأصلي — ${file.name}</div>
+          <div class="translate-text">${file.content.substring(0, 3000)}${file.content.length > 3000 ? '...' : ''}</div>
+        </div>
+        <div style="text-align:center; font-size:24px; margin: 12px 0;">⬇️</div>
+        <div class="translate-box" style="border-color: var(--accent3);">
+          <div class="translate-label" style="color:var(--accent3);">الترجمة إلى ${langNames[lang]}</div>
+          <div class="translate-text">${translated}</div>
+        </div>
+        <button class="btn btn-primary" onclick="downloadTranslation('${file.name}', \`${translated.replace(/`/g, '\\`')}\`)" style="margin-top:16px;">💾 تحميل الترجمة</button>
+      </div>`;
+  } catch (e) {
+    hideLoader();
+    alert('خطأ: ' + e.message);
+  }
+}
+
+function downloadTranslation(name, text) {
+  const blob = new Blob([text], { type: 'text/plain; charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'translated_' + name + '.txt';
+  a.click();
+}
+
+// ══ LOADER ══
+function showLoader(text) {
+  document.getElementById('loaderText').textContent = text || 'جاري المعالجة...';
+  document.getElementById('globalLoader').style.display = 'flex';
+}
+function hideLoader() {
+  document.getElementById('globalLoader').style.display = 'none';
+}
+
+// ══ START ══
+init();
+</script>
+</body>
+</html>
